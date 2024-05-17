@@ -4,7 +4,8 @@ var conn = mysql.createConnection({
     host: "localhost",
     user: "root",
     password: "guro1234",
-    database: "myboard"
+    database: "myboard",
+    dateStrings: 'date'
 });
 
 conn.connect((err) => {
@@ -16,25 +17,25 @@ conn.connect((err) => {
 });
 
 
-conn.query("select * from post",function(err,rows,fields){
-    if(err) throw err;
-    console.log(rows);
-});
+// conn.query("select * from post",function(err,rows,fields){
+//     if(err) throw err;
+//     console.log(rows);
+// });
 
-conn.query("select * from customer",function(err,rows,fields){
-    if(err) throw err;
-    console.log(rows);
-});
+// conn.query("select * from customer",function(err,rows,fields){
+//     if(err) throw err;
+//     console.log(rows);
+// });
 
-conn.query("select * from product",function(err,rows,fields){
-    if(err) throw err;
-    console.log(rows);
-});
+// conn.query("select * from product",function(err,rows,fields){
+//     if(err) throw err;
+//     console.log(rows);
+// });
 
-conn.query("select * from orders",function(err,rows,fields){
-    if(err) throw err;
-    console.log(rows);
-});
+// conn.query("select * from orders",function(err,rows,fields){
+//     if(err) throw err;
+//     console.log(rows);
+// });
 
 
 const express = require('express');
@@ -65,13 +66,81 @@ app.get('/list', function(req, res) {
     });
 });
 
+// app.get('/content/:id', function(req, res) {
+//     conn.query('SELECT * FROM post WHERE id = ?', function(err, result) {
+//         if (err) {
+//             console.error('쿼리 실행 오류:', err);
+//             res.status(500).send('데이터 조회 실패');
+//             return;
+//         }
+//         console.log(result);
+//         res.render('content.ejs', { data: result });
+//     });
+// });
 
 
-app.get('/enter', function(req, res) {
-    res.render('enter.ejs');
-});
+app.get("/content/:id",function(req,res){
+    console.log(req.params.id);
+    let sql="select * from post where id=?";
+    let params=req.params.id;
+    conn.query(sql,params,function(err,result){
+      if(err) throw err;
+      console.log(result);
+      res.render("content.ejs",{data : result});
+    });
+    
+  })
 
 
+
+app.get('/enter',function(req,res){
+    res.render('enter.ejs')
+  });
+  
+  app.get('/enterpage',function(req,res){
+    res.sendFile(__dirname+'enter.ejs')
+  });
+  
+  
+
+app.get("/edit/:id",function(req,res){
+    let sql="select * from post where id=?";
+    let params=req.params.id;
+    conn.query(sql,params,function(err,result){
+      if(err) throw err;
+      console.log(result);
+      res.render("edit.ejs",{data : result});
+    });
+  })
+  
+  app.post("/edit",function(req,res){
+    let sql="update post set title=?, content=?, created=? where id=?";
+    let params=[req.body.title, req.body.content, req.body.someDate, req.body.id];
+    conn.query(sql,params,function(err,result){
+      if(err) throw err;
+      console.log(result);
+      res.redirect("/list");
+    });
+  })
+
+// app.get('/content', function(req, res) {
+//     res.render('content.ejs');
+// });
+
+// app.get('/content/:1', function(req, res) {
+//     console.loh(req,params.id)
+//     req.params.id = new ObjId(req.params.id);
+//     mysql
+//     res.render('content.ejs');
+// });
+
+// app.get('/content/:id', (req, res) =>{
+//     const contentId = req.params.id;
+
+//     const query = 'SELECT * FROM contents WHERE id = ?';
+//     connection.query(query, [contentId], (err, results) => {
+//     });
+// });
 
 app.post("/delete", function(req, res) {
     console.log(req.body);
@@ -107,7 +176,7 @@ app.post('/save1', function(req, res) {
             return;
         }
         console.log("데이터 추가 성공");
-        res.send('데이터 추가 성공');
+        res.redirect("/list");
     });
 });
 
@@ -202,7 +271,7 @@ app.post('/save4', function(req, res) {
 // });
 
 app.get('/', function(req, res) {
-    res.sendFile(__dirname + '/index.html');
+    res.render('index.ejs')
 });
 
 app.get('/profile', function(req, res) {
@@ -214,3 +283,4 @@ app.get('/profile', function(req, res) {
 //     console.log(rows);
 // });
 
+app.use(express.static('public'));
