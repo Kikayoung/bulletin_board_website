@@ -275,7 +275,8 @@ app.get('/', function(req, res) {
 });
 
 app.get('/profile', function(req, res) {
-    res.sendFile(__dirname + '/profile.html');
+    //res.sendFile(__dirname + '/profile.ejs');
+    res.render('/profile.ejs')
 });
 
 // conn.query("select * from post",function(err,rows,fields){
