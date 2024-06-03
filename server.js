@@ -12,7 +12,7 @@ var mysql = require("mysql");
 var conn = mysql.createConnection({
     host: "localhost",
     user: "root",
-    password: "guro1234",
+    password: "1234",
     database: "myboard",
     dateStrings: 'date'
 });
